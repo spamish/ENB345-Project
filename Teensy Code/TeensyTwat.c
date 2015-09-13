@@ -1,10 +1,13 @@
-/**
-* Following includes:
-*	- avr/io.h includes the port and pin definitions (i.e. DDRB, PORTB, PB1, etc)
-*	- util/delay.h provides the _delay_ms function which is very useful
-*	- LCD.h includes the LCD.c functions
-*	- Graphics.h includes the Graphics.c functions
-*/
+/*
+ * TeensyTwat.c
+ *
+ * Created: 13/09/2015.
+ * Last modified: 14/09/2015.
+ * Author: Alex Fernicola, Rebecca Hopping and Samuel Janetzki.
+ * 
+ * Details.
+ */ 
+
 #include <avr/io.h>
 #include <util/delay.h> 
 #include "LCD.h" 
@@ -51,7 +54,8 @@ int main() {
 	//define variables.
 	int angle = 0; float power = 0.0; 
 	char print[2];
-	while(1){
+	int alpha, beta;
+	while(1) {
 		//int game = StartScreen(); //StartScreen function.s
 		int game = 3;
 		int over = 0; //asks if the game is over.
@@ -59,180 +63,26 @@ int main() {
 		turn = 0; //restart the turn counter.
 		int w = 0; //assume we aren't playing with wind.
 		// game = 4;
-		float wind = 0;
-		AIxpos = 13; //AI Adjusters shouldn't adjust the first shot.
+		ADMUX &= ~(1<<MUX0);
+		ADCSRA |= (1<<ADSC);
+		while(ADCSRA & (1 << ADSC)) {}
+		alpha = ADCH;
 		
-		/* if(game == 1){ //game 1 is 1v1.
-			while(over == 0){
-				SW0 = checkbutton0(); //debouncer function.
-				SW1 = checkbutton1(); //debouncer function.
-				if(countd == 0){ //make sure the counter only happens once.
-					Countdown();
-					countd = 1;
-					Board(); //function that sets up the board
-					Tank(10,43); //Set up tank at position 10
-					Tank(LCD_X-15,43); //Set up tank 15 pixels away from the edge
-				}
-				if((turn%2) ==0){
-					LCDPosition(0,0);
-					LCDString("Player 1:");
-					_delay_ms(1500);
-					LCDPosition(0,0);
-					LCDString("            ");//lazy way to clear the previous string.
-				}
-				if((turn%2) ==1){
-					LCDPosition(0,0);
-					LCDString("Player 2:");
-					_delay_ms(1500);
-					LCDPosition(0,0);
-					LCDString("            ");//lazy way to clear the previous string.
-				}
-				power = SetPower(0,0); //Power function choose power between 10 and 100
-				LCDPosition(0,0); //Set position back to 0,0
-				LCDString("Set!");
-				_delay_ms(1000);
-				
-				angle = SetAngle((turn%2),0,0); //angle function choose between 10 and 80 degrees.
-				LCDPosition(0,0);
-				LCDString("Set!");
-				_delay_ms(1000);
-				
-				//ready to fire!
-				over = FIREBULLET(power,angle,(turn%2),w);
-				LCDPosition(0,0);
-				DrawBox(0,0,0,0,0,2);
-				ClearBuffer2();
-				turn++;
-			}
-		}
-		if(game == 2){ //game 2 is 1 v AI.
-			while(over == 0){
-				SW0 = checkbutton0();
-				SW1 = checkbutton1();
-				if(countd == 0){
-					Countdown();
-					Board();
-					Tank(10,43);
-					Tank(LCD_X-15,43);
-					seedWithButtonPress(); //seed AI random factor.
-					countd = 1;
-				}
-				if((turn%2) ==0){
-					LCDPosition(0,0);
-					LCDString("Player:");
-					_delay_ms(1500);
-					LCDPosition(0,0);
-					LCDString("       ");
-				}
-				if((turn%2) ==1){
-					LCDPosition(0,0);
-					LCDString("AI:");
-					_delay_ms(1500);
-				}
-				power = SetPower((turn%2),0); //Power function choose power between 10 and 100
-				LCDPosition(0,0);
-				LCDString("Set!");
-				_delay_ms(1000);
-				
-				angle = SetAngle((turn%2),(turn%2),0); //angle function choose between 10 and 80 degrees.
-				LCDPosition(0,0);
-				LCDString("Set!");
-				
-				//ready to fire!
-				over = FIREBULLET(power,angle,(turn%2),w);//0 for left tank.
-				LCDPosition(0,0);
-				DrawBox(0,0,0,0,0,2);
-				ClearBuffer2();
-				turn++;
-			}
-		}
-		if(game ==3){ //game 3 includes wind.
-			while(over ==0){
-				if(countd == 0){ //make sure the counter only happens once.
-					Countdown();
-					countd = 1;
-					_delay_ms(1000);
-					Board();
-					Tank(10,43);
-					Tank(LCD_X-15,43);
-					//seedWithButtonPress();
-				}
-				if((turn%2) ==0){
-					LCDPosition(0,0);
-					LCDString("Player:");
-					_delay_ms(1500);
-					LCDPosition(0,0);
-					LCDString("       ");
-				}
-				if((turn%2) ==1){
-					LCDPosition(0,0);
-					LCDString("AI:");
-					_delay_ms(1500);
-				}
-				// LCDPosition(0,0); //Set position back to 0,0
-				power = SetPower((turn%2),1); //Power function choose power between 10 and 100
-				LCDPosition(0,0);
-				LCDString("Set!");
-				_delay_ms(1000);
-				
-				angle = SetAngle((turn%2),(turn%2),1); //angle function choose between 10 and 80 degrees.
-				LCDPosition(0,0);
-				LCDString("Set!");
-				_delay_ms(1000);
-				
-				over = FIREBULLET(power,angle,(turn%2),1);//1 is to turn the wind on.
-				LCDPosition(0,0);
-				DrawBox(0,0,0,0,0,2);
-				ClearBuffer2();
-				turn++;
-			}
-		}
-		if(game ==4){ //1 vs AI with wind, random terrain.
-			LCDClear();
-			while(over == 0){
-				while(countd == 0){
-					Countdown();
-					seedWithButtonPress();
-					Terrain();
-					player_x = randInRange(1,74); //Needs room to actually draw two tanks.
-					player_y = y_coords[player_x];
-					Tank(player_x,player_y);
-					AI_x = randInRange(player_x+5,79); //I want AI on the right of the player OKAY?!
-					AI_y = y_coords[AI_x];
-					Tank(AI_x,AI_y);
-					countd = 1;
-				}
-				if((turn%2) ==0){
-					LCDPosition(0,0);
-					LCDString("Player:");
-					_delay_ms(1500);
-					LCDPosition(0,0);
-					LCDString("       ");
-				}
-				if((turn%2) ==1){
-					LCDPosition(0,0);
-					LCDString("AI:");
-					_delay_ms(1500);
-				}
-				power = SetPower((turn%2),1); //Power function choose power between 10 and 100
-				LCDPosition(0,0);
-				LCDString("Set!");
-				_delay_ms(1000);
-				
-				angle = SetAngle((turn%2)+2,(turn%2),1); //angle function choose between 10 and 80 degrees.
-				LCDPosition(0,0);
-				LCDString("Set!");
-				_delay_ms(1000);
-				
-				over = FIREBULLET(power,angle,(turn%2)+2,1); //firebullet is a little different with mountains.
-				LCDPosition(0,0);
-				DrawBox(0,0,0,0,0,2);
-				ClearBuffer2();
-				turn++;
-			}
-		}
-	} */
-	return 0;
+		ADMUX |= (1<<MUX0);
+		ADCSRA |= (1<<ADSC);
+		while(ADCSRA & (1 << ADSC)) {}
+		beta = ADCH;
+		
+		char displaya[2];
+		itoa(alpha,displaya,10);
+		LCDPosition(0,0);
+		LCDString(displaya);
+		
+		char displayb[2];
+		itoa(beta,displayb,10);
+		LCDPosition(64,0);
+		LCDString(displayb);
+    }
 }
 
 /**
@@ -244,7 +94,7 @@ int main() {
 void init() {
 	CPU_PRESCALE(0);
 	LCDInitialise(LCD_LOW_CONTRAST);
-	LCDInitialise(LCD_LOW_CONTRAST);
+	//LCDInitialise(LCD_HIGH_CONTRAST);
 	ClearBuffer();
 	ClearBuffer2();
 	LCDClear();
@@ -252,14 +102,14 @@ void init() {
 	PORTB |= 0x00;
 	
 	//ADC
-	ADMUX |= (1<<REFS0)|(1<<ADLAR);
-	ADCSRA |= (1<<ADEN)|(1<<ADATE)|(1<<ADPS2)|(1<<ADPS1)|(1<<ADPS0); 
+	ADMUX |= (1<<REFS0)|(1<<ADLAR); //Set MUX values to 000000 or 000001.
+	ADCSRA |= (1<<ADEN)|(1<<ADPS2)|(1<<ADPS0); //ADSC for each conversion.
 
-	ADCSRA |= (1<<ADSC);
+	//ADCSRA |= (1<<ADSC);
 }
 
 //Checks if Left button has actually been pressed.
-int checkbutton0(){
+int checkbutton0() {
 	int SW0 = ((PINB>>0)&1);
 	if (SW0 == 1){
 		_delay_ms(100); //debouncer.
@@ -269,7 +119,7 @@ int checkbutton0(){
 }
 
 //Checks if the Right button has actually been pressed.
-int checkbutton1(){
+int checkbutton1() {
 	int SW1 = ((PINB>>1)&1);
 	if(SW1 == 1){
 		_delay_ms(100); //debouncer.
@@ -279,7 +129,7 @@ int checkbutton1(){
 }
 
 //Start Screen with name, student number, name of game, start button and menu button.
-int StartScreen(){
+int StartScreen() {
 	char *line1 = "Scorched1";
 	int line1_len = strlen(line1);
 	int middle = (LCD_X - (line1_len*7))/2;
@@ -326,7 +176,7 @@ int StartScreen(){
 }
 
 //Menu with different game options.
-int Menu(){
+int Menu() {
 	LCDClear();
 	char *line0 = "MENU";
 	int line0_len = strlen(line0);
@@ -436,7 +286,7 @@ int Menu(){
 }
 
 //Countdown to start game.
-void Countdown(){
+void Countdown() {
 	_delay_ms(1000);//waits a second
 	LCDClear();
 	LCDPosition(((LCD_X-7)/2),2);
@@ -454,7 +304,7 @@ void Countdown(){
 }
 
 //Sets Angle.
-int SetAngle(unsigned char xpos, unsigned char AI, unsigned char w){
+int SetAngle(unsigned char xpos, unsigned char AI, unsigned char w) {
 	//draw line from tank
 	int order = 0; int angle = 10;
 	int SW0; int SW1;
@@ -591,7 +441,7 @@ int SetAngle(unsigned char xpos, unsigned char AI, unsigned char w){
 }
 
 //Sets Power.
-float SetPower(unsigned char AI,unsigned char w){
+float SetPower(unsigned char AI,unsigned char w) {
 	int SW0 = checkbutton0();
 	int SW1 = checkbutton1();
 	float power = 10.0; //initial power value at 10%
@@ -680,7 +530,7 @@ float SetPower(unsigned char AI,unsigned char w){
 	}
 }
 
-float PowerConverter(int power){
+float PowerConverter(int power) {
 	//power is in 10% increments of the max power.
 	float floatpower;
 	float max = 0.5; //max power.
@@ -718,7 +568,7 @@ float PowerConverter(int power){
 	return floatpower;
 }
 
-int FIREBULLET(float power, int angle, int tank, int w){
+int FIREBULLET(float power, int angle, int tank, int w) {
 	float anglerad = angle*(M_PI/180); //convert degrees to radians.
 	float x_init;
 	float y_init;
@@ -985,7 +835,7 @@ int FIREBULLET(float power, int angle, int tank, int w){
 	}
 }
 
-void Terrain(){
+void Terrain() {
 	int length_y_coords = 84; //84 pixels along the screen so we need 84 ycoordinate heights.
 	y_coords[length_y_coords]; //length of the y coordinate array.
 	generateTerrainPoints(y_coords, length_y_coords);
@@ -1025,53 +875,5 @@ void Terrain(){
 				}
 			}
 		}
-	}
-}
-
-int SetWind(){
-	//ADCH
-	int wind = 0;
-	wind |= (ADCH>>5); //changes the values of the wind between 0-7.
-	if(wind == 0){
-		wind = 15;
-		LCDPosition(64,0);
-		LCDString("RRR");
-		return wind;
-	}
-	if(wind ==1){
-		wind = 10;
-		LCDPosition(64,0);
-		LCDString("RR ");
-		return wind;
-	}
-	if(wind ==2){
-		wind = 5;
-		LCDPosition(64,0);
-		LCDString("R  ");
-		return wind;
-	}
-	if(wind ==3 || wind == 4){
-		wind = 0;
-		LCDPosition(64,0);
-		LCDString("---");
-		return wind;
-	}
-	if(wind ==5){
-		wind = -5;
-		LCDPosition(64,0);
-		LCDString("L  ");
-		return wind;
-	}
-	if(wind ==6){
-		wind = -10;
-		LCDPosition(64,0);
-		LCDString("LL ");
-		return wind;
-	}
-	if(wind ==7){
-		wind = -15;
-		LCDPosition(64,0);
-		LCDString("LLL");
-		return wind;
 	}
 }
