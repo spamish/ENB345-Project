@@ -41,7 +41,7 @@
 
 
 # Target file name (without extension).
-TARGET = Sam
+TARGET = main
 
 
 # List C source files here. (C dependencies are automatically generated.)
@@ -540,7 +540,7 @@ extcoff: $(TARGET).elf
 %.elf: $(OBJ)
 	@echo
 	@echo $(MSG_LINKING) $@
-	$(CC) $(ALL_CFLAGS) $^ --output $@ $(LDFLAGS)
+	$(CC) $(ALL_CFLAGS) $(OBJ) --output $@ $(LDFLAGS)
 
 
 # Compile: create object files from C source files.

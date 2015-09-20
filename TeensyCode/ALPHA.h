@@ -1,0 +1,121 @@
+/*
+ * Transceiver.h
+ *
+ * Created: dd/mm/2015.
+ * Last modified: dd/mm/2015.
+ * Authors: Alex Fernicola, Rebecca Hopping and Samuel Janetzki.
+ * 
+ * Details:
+ * Pins                            _____________ 
+ *          MISO -           SDO - |   __        | - nSEL - SS
+ *          INT1 -          nIRQ - |  |  |       | - SCK  - SCK
+ *    VCC -> RES -   FSK/Data/nFF- |  |  | {   } | - SDI  - MOSI
+ *               - DCLK/CFIL/FFIT- |  |  | {   } | - nINT - INT2
+ *    VCC -> RES -            CLK- |  |  |       | - GND  - GND
+ *           RES -          nRES-  |  |__|       | - VDD  - VCC
+ *           GND -           GND-  |_____________| - ANT  - Antenna
+ */
+
+/* Include libraries */
+#include "ALPHA.c"
+
+/* Description: 
+ * Parameters:  
+ * Return:      
+ */
+void InitAlpha();
+
+/* Description:  
+ * Parameters:  
+ * Return:      
+ */
+void SendAlpha();
+
+/* Description:  
+ * Parameters:  
+ * Return:      
+ */
+void RecAlpha();
+
+/* Notes
+Configuration Setting Command, Default => 0x8008 -> 0b1000 0000 0000 1000
+1000 0000 | el  | ef  | b1 b0 | x3 x2 x1 x0
+For init
+0x8000    | 0b0 | 0b0 | 0b01  | 0b0001
+For transmit
+0x8011    | 0b1 | 0b0
+For receive
+0x8011    | 0b0 | 0b1
+
+Power Management Command, Default => 0x8208 -> 0b1000 0010 0000 1000
+1000 0010 | er  | ebb | et  | es  | ex  | eb  | ew  | dc
+For init
+0x82      | 0b0 | 0b0 | 0b0 | 0b1 | 0b1 | 0b0 | 0b0 | 0b1
+For transmit
+0x8219    | 0b0 | 0b1 | 0b1
+For receive
+0x8219    | 0b1 | 0b0 | 0b0
+
+Frequency Setting Command, Default => 0xA680 -> 0b1010 0110 1000 0000
+1010   | f11 f10 f9 f8 f7 f6 f5 f4 f3 f2 f1 f0
+Frequency => 432.1 MHz (for shits and giggles)
+Desired freq = 430 + f * 0.0025 MHz
+For init // Push (0x69 << 3)
+0xA000 | 0b0011 0100 1000
+
+Data Rate Command, Default => 0xC623 -> 0b1100 0110 0010 0011
+1100 0110 | cs  | r6 r5 r4 r3 r2 r1 r0
+Baud Rate => 
+Desired Baud Rate => (10 * 10^6) / 29 / (r + 1) / (1 + cs * 7)
+0xC600    | 0b  | 0b
+
+Rx Control Command, Default => 0x9080 -> 0b1001 0000 1000 0000
+1001 0 | p16 | d1 d0 | i2 i1 i0 | g1 g0 | r2 r1 r0
+For init
+0x9000 | 0b  | 0b    | 0b       | 0b    |
+
+Data Filter Command, Default => 0xC22C -> 0b1100 0010 0010 1100
+1100 0010 | al | ml | 1 | s  | 1 | f2 f1 f0
+For init
+0xC228    | 0b | 0b     | 0b     | 0b
+
+FIFO and Reset Mode Command, Default => 0xCA80 -> 0b1100 1010 1000 0000
+1100 1010 | f3 f2 f1 f0 | sp | al | ff | dr
+For init
+0xCA00    | 0b          | 0b | 0b | 0b | 0b
+
+Synchron Pattern Command, Default => 0xCED4 -> 0b1100 1110 1101 0100
+1100 1110 | b7 b6 b5 b4 b3 b2 b1 b0
+For init
+0xCE00    | 0b
+
+AFC Command, Default => C4F7 -> 0b1100 0100 1111 0111
+1100 0100 | a1 a0 | rl1 rl0 | st | fi | oe | en
+For init
+0xC400    | 0b    | 0b      | 0b | 0b | 0b | 0b
+
+Tx Configuration Command, Default => 0x9800 -> 0b1001 1000 0000 0000
+1001 100 | mp | m3 m2 m1 m0 | 0 | p2 p1 p0
+For init
+0x9800   | 0b | 0b              | 0b
+
+PLLSettings Command, Default => 0xCC67 -> 0b1100 1100 0110 0111
+1100 1100 0 | ob1 ob0 | lpx | ddy | ddit | 1 | bw
+For init
+0xCC02      | 0b      | 0b  | 0b  | 0b       | 0b
+
+Wake Up Timer Command, Default => 0xE196 -> 0b1110 0001 1001 0110
+111    | r4 r3 r2 r1 r0 | m7 m6 m5 m4 m3 m2 m1 m0
+For init
+0xE000 | 0b             | 0b
+
+Low Duty Cycle Command, Default => 0xC80E -> 0b1100 1000 0000 1110
+1100 1000 | d6 d5 d4 d3 d2 d1 d0 | en
+For init
+0xC800    | 0b                   | 0b
+
+Low Batt and Mic Clk Div Command, Default => 0xC000 -> 0b1100 0000 0000 0000
+1100 0000 | d2 d1 d0 | 0 | v3 v2 v1 v0
+For init
+0xC000    | 0b           | 0b
+*/
