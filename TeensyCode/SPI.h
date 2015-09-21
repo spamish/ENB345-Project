@@ -1,11 +1,13 @@
 /*
  * SPI.h
  *
- * Created: dd/mm/2015.
- * Last modified: dd/mm/2015.
+ * Created: 18/09/2015.
+ * Last modified: 22/09/2015.
  * Authors: Alex Fernicola, Rebecca Hopping and Samuel Janetzki.
  * 
- * Details.
+ * Details
+ *  Contains functions for intialising the SPI module, sending and receiving
+ *  data.
  */
 
 /* Include libraries */
@@ -16,12 +18,8 @@
  */
 void InitSPI();
 
-/* Description:  Pushes data across the SPI.
- * Parameters:   data - Byte of data to be sent.
+/* Description: Sends and receives data over SPI.
+ * Parameters:  data - 2 bytes of data to be sent.
+ * Return:      2 bytes of data received from SPI.
  */
-void PushSPI(char data);
-
-/* Description: Pulls data from the SPI read buffer.
- * Return:      One byte of data from the register.
- */
-char PullSPI();
+int PushSPI(int data);

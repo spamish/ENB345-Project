@@ -1,8 +1,8 @@
 /*
  * SPI.c
  *
- * Created: dd/mm/2015.
- * Last modified: dd/mm/2015.
+ * Created: 18/09/2015.
+ * Last modified: 22/09/2015.
  * Authors: Alex Fernicola, Rebecca Hopping and Samuel Janetzki.
  */
 
@@ -14,15 +14,13 @@ void InitADC()
 
 char ReadADC(char sens)
 {
-    if(sens == FLOW)
-    {
-        // Select flow pin.
-        ADMUX &= ~SHIFT(MUX0);
-    }
-    else
+    if(sens)
     {
         // Select temp pin.
-        ADMUX |= SHIFT(MUX0);
+        ADMUX |= SHIFT(0);
+    } else {
+        // Select flow pin.
+        ADMUX &= ~SHIFT(0);
     }
     
     // Start conversion.

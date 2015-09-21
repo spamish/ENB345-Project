@@ -2,21 +2,28 @@
  * main.c
  *
  * Created: 13/09/2015.
- * Last modified: 14/09/2015.
+ * Last modified: 22/09/2015.
  * Authors: Alex Fernicola, Rebecca Hopping and Samuel Janetzki.
  * 
- * Details.
+ * Details
+ *  Contains constant and macro definitions.
  */
 
 /* Constant declarations */
-#define TEMP    ADC0D
-#define FLOW    ADC1D
-#define ID      0x01
+#define FLOW    0
+#define TEMP    1
+#define ID      0x4C // or 0x45. a"L"pha or b"E"ta
 #define SS      DDB0
 #define SCK     DDB1
 #define MOSI    DDB2
 #define MISO    DDB3
 #define NIRQ    DDD0
+#define SPI     PINB
+#define TX      0x54 //ASCII T
+#define RX      0x52 //ASCII R
+#define READ    0xB000
+#define SEND    0xB800
+
 
 /* Macro definitions */
 #define SHIFT(places) (1 << (places))

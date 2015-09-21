@@ -1,36 +1,45 @@
 /*
  * SPI.c
  *
- * Created: dd/mm/2015.
- * Last modified: dd/mm/2015.
+ * Created: 18/09/2015.
+ * Last modified: 22/09/2015.
  * Authors: Alex Fernicola, Rebecca Hopping and Samuel Janetzki.
  */
 
 void InitSPI()
 {
-    char spi;
     // Set pins.
-    DDRB = SHIFT(MOSI) | SHIFT(SCK);
+    DDRB |= SHIFT(MOSI) | SHIFT(SCK) | SHIFT(SS);
+    PORTB |= SHIFT(SS);
+    
     // Set SPI modes.
     // SPCR = SPIE | SPE | DORD | MSTR | CPOL | CPHA | SPR1 | SPR0
-    // Default value,  0x00
-    SPCR = SHIFT(SPE) | SHIFT(MSTR);
+    SPCR |= SHIFT(SPE) | SHIFT(MSTR) | SHIFT(SPR0);
+    SPSR |= SHIFT(SPI2X);
 }
 
-void PushSPI(char data)
+int PushSPI(int data)
 {
-    // Start transmission
-    SPDR = data;
-    // Wait for transmission complete
-    while(!(SPSR & SHIFT(SPIF))) {}
-}
-
-char PullSPI()
-{
-    // Start transmission
-    SPDR = 0x00;
+    char i;
+    int ret = 0;
     
-    while(!(SPSR & SHIFT(SPIF))) {}
+    // Start transmission.
+    SPI &= ~SHIFT(SS);
     
-    return SPDR;
+    for(i = 1; i >= 0; i--)
+    {
+        // Send most significant to least significant.
+        SPDR = (data >> (4 * i));
+        
+        // Wait for transmission complete.
+        while(!(SPSR & SHIFT(SPIF))) {}
+        
+        // Save returned value.
+        ret |= (SPDR << (4 * i));
+    }
+    
+    // End transmission.
+    SPI |= SHIFT(SS);
+    
+    return ret;
 }

@@ -1,11 +1,12 @@
 /*
  * SPI.h
  *
- * Created: dd/mm/2015.
- * Last modified: dd/mm/2015.
+ * Created: 18/09/2015.
+ * Last modified: 20/09/2015.
  * Authors: Alex Fernicola, Rebecca Hopping and Samuel Janetzki.
  * 
- * Details:
+ * Details
+ *  Contains functions for intialising the ADC module and reading data.
  */
 
 /* Include libraries */
@@ -20,8 +21,3 @@ void InitADC();
  * Return:      10 bit left adjusted value representing voltage level.
  */
 char ReadADC(char sens);
-
-/* Description: 
- * Parameters:  
- * Return:      
- */
