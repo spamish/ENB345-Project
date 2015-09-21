@@ -8,26 +8,32 @@
 
 void InitADC()
 {
-	ADMUX |= SHIFT(REFS0)|SHIFT(ADLAR); //Set MUX values to 000000 or 000001.
-	ADCSRA |= SHIFT(ADEN)|SHIFT(ADPS2)|SHIFT(ADPS0); //ADSC for each conversion.
+	ADMUX |= SHIFT(REFS0) | SHIFT(ADLAR); //Set MUX values to 000000 or 000001.
+	ADCSRA |= SHIFT(ADEN) | SHIFT(ADPS0); //ADSC for each conversion.
 }
 
 char ReadADC(char sens)
 {
+    char data;
+    
     if(sens)
     {
         // Select temp pin.
-        ADMUX |= SHIFT(0);
+        ADMUX |= SHIFT(MUX0);
     } else {
         // Select flow pin.
-        ADMUX &= ~SHIFT(0);
+        ADMUX &= ~SHIFT(MUX0);
     }
     
     // Start conversion.
     ADCSRA |= SHIFT(ADSC);
     
     // Wait for conversion to finish.
-    while(ADCSRA & SHIFT(ADIF)) {}
+    while(!(ADCSRA & SHIFT(ADIF))) {}
     
-    return ADCH;
+    data = ADCH;
+    
+    ADCSRA |= SHIFT(ADIF);
+    
+    return data;
 }

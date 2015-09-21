@@ -12,7 +12,6 @@
 /* Constant declarations */
 #define FLOW    0
 #define TEMP    1
-#define ID      0x4C // or 0x45. a"L"pha or b"E"ta
 #define SS      DDB0
 #define SCK     DDB1
 #define MOSI    DDB2
