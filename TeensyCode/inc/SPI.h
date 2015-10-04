@@ -22,4 +22,4 @@ void InitSPI();
  * Parameters:  data - 2 bytes of data to be sent.
  * Return:      2 bytes of data received from SPI.
  */
-int PushSPI(int data);
+unsigned int PushSPI(unsigned int data);

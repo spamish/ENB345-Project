@@ -8,7 +8,7 @@
 
 void InitAlpha()
 {
-    int data;
+    unsigned int data;
     data = 0x8011; // Configuration Setting
     PushSPI(data);
     
@@ -43,9 +43,9 @@ void InitAlpha()
     PushSPI(data);
 }
 
-char ReceiveAlpha()
+unsigned char ReceiveAlpha()
 {
-    int data;
+    unsigned int data;
     
     // Wait for nIRQ to go low
     while(PIND & SHIFT(NIRQ)) {}
@@ -53,12 +53,12 @@ char ReceiveAlpha()
     // Read from FIFO
     data = PushSPI(READ);
     
-    return (char) data;
+    return (unsigned char) data;
 }
 
-void SendAlpha(char info)
+void SendAlpha(unsigned char info)
 {
-    int data = SEND;
+    unsigned int data = SEND;
     
     // Wait for nIRQ to go low
     while(PIND & SHIFT(NIRQ)) {}
@@ -69,9 +69,9 @@ void SendAlpha(char info)
     PushSPI(data);
 }
 
-void SwtichAlpha(char dir)
+void SwtichAlpha(unsigned char dir)
 {
-    int data;
+    unsigned int data;
     
     switch(dir)
     {

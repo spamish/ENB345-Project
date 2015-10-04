@@ -20,4 +20,4 @@ void InitADC();
  * Parameters:  sensor - Identifier of the sensor to read.
  * Return:      10 bit left adjusted value representing voltage level.
  */
-char ReadADC(char sens);
+unsigned char ReadADC(unsigned char sens);

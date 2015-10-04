@@ -1,5 +1,5 @@
 /*
- * main.c
+ * macros.h
  *
  * Created: 13/09/2015.
  * Last modified: 22/09/2015.
@@ -17,11 +17,14 @@
 #define MOSI    DDB2
 #define MISO    DDB3
 #define NIRQ    DDD0
-#define SPI     PINB
 #define TX      0x54 //ASCII T
 #define RX      0x52 //ASCII R
 #define READ    0xB000
 #define SEND    0xB800
+
+#define CPU_PRESCALE(n) (CLKPR = 0x80, CLKPR = (n))
+#define CPU_16MHz       0x00
+#define CPU_8MHz        0x01
 
 
 /* Macro definitions */

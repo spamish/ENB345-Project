@@ -19,10 +19,10 @@ void Init();
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "macros.h"
-#include "ADC.h"
-#include "SPI.h"
-#include "ALPHA.h"
+#include "inc/macros.h"
+#include "inc/ADC.h"
+#include "inc/SPI.h"
+#include "inc/ALPHA.h"
 
 // Identifier of the individual teensy
 //================================================

@@ -17,17 +17,18 @@ void Init();
 #include <avr/io.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <util/delay.h> 
 
-#include "macros.h"
-#include "ADC.h"
+#include <util/delay.h>
+#include "inc\usb_debug_only.c"
+#include "inc\print.c"
+
+#include "inc\macros.h"
+#include "inc\ADC.h"
 
 /* Main function */
 int main() {
-    char tempVal; // 8 bit value of the temperature.
-    char flowVal; // 8 bit value of the flow rate.
-    char tempCount = 0;
-    char flowCount = 0;
+    unsigned char tempVal; // 8 bit value of the temperature.
+    unsigned char flowVal; // 8 bit value of the flow rate.
     
     Init();
     
@@ -36,24 +37,11 @@ int main() {
         tempVal = ReadADC(TEMP);
         flowVal = ReadADC(FLOW);
         
-        // Set LED's
-        if(tempVal == tempCount)
-        {
-            tempCount = 0;
-            PORTB ^= SHIFT(PB0);
-        } else {
-            tempCount++;
-        }
-        
-        if(flowVal == flowCount)
-        {
-            flowCount = 0;
-            PORTB ^= SHIFT(PB1);
-        } else {
-            flowCount++;
-        }
-        
-		_delay_ms(2);
+        phex(tempVal);
+		print("\t");
+        phex(flowVal);
+		print("\n");
+        _delay_ms(500);
     }
 }
 
@@ -61,9 +49,7 @@ int main() {
  */
 void Init()
 {
-    // Set outputs.
-    DDRB |= SHIFT(PB0) | SHIFT(PB1);
-    PORTB &= ~SHIFT(PB0) | ~SHIFT(PB1);
+    usb_init();
     
     InitADC();
 }

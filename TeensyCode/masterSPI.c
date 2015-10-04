@@ -1,5 +1,5 @@
 /*
- * main.c
+ * masterSPI.c
  *
  * Created: 13/09/2015.
  * Last modified: 22/09/2015.
@@ -13,46 +13,40 @@
 
 /* Function declarations */
 void Init();
+void Push(unsigned int data);
 
 /* Included libraries */
 #include <avr/io.h>
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "macros.h"
-#include "ADC.h"
-#include "SPI.h"
+#include <util/delay.h>
+#include "inc\usb_debug_only.c"
+#include "inc\print.c"
+
+#include "inc\macros.h"
+#include "inc\SPI.h"
 
 /* Main function */
 int main() {
-    char tempVal; // 8 bit value of the temperature.
-    char flowVal; // 8 bit value of the flow rate.
-    int data; // Status of device.
-    char i;
+    CPU_PRESCALE(CPU_16MHz);
     
+    unsigned char tempVal = 0x0F; // 8 bit value of the temperature.
+    unsigned char flowVal = 0xF0; // 8 bit value of the flow rate.
+    unsigned int data; // Status of device.
+   
     Init();
     
     while(1) {
         // Gather sensor values.
-        tempVal = ReadADC(TEMP);
-        flowVal = ReadADC(FLOW);
+        tempVal++;
+        flowVal--;
         
-        data = ((tempVal<<4) | flowVal);
+        data = ((tempVal << 8) | flowVal);
         
-        // Start transmission.
-        SPI &= ~SHIFT(SS);
+        Push(data);
         
-        for(i = 1; i >= 0; i--)
-        {
-            // Send most significant to least significant.
-            SPDR = (data >> (4 * i));
-            
-            // Wait for transmission complete.
-            while(!(SPSR & SHIFT(SPIF))) {}
-        }
-        
-        // End transmission.
-        SPI |= SHIFT(SS);
+        _delay_ms(1000);
     }
 }
 
@@ -60,7 +54,28 @@ int main() {
  */
 void Init()
 {
-    InitADC();
+    //usb_init();
     
     InitSPI();
+}
+
+void Push(unsigned int data)
+{
+    // Start transmission.
+    PORTB &= ~SHIFT(SS);
+    
+    // Send most significant.
+    SPDR = (char) (data >> 8);
+    
+    // Wait for transmission complete.
+    while(!(SPSR & SHIFT(SPIF))) {}
+    
+    // Send least significant.
+    SPDR = (char) data;
+    
+    // Wait for transmission complete.
+    while(!(SPSR & SHIFT(SPIF))) {}
+    
+    // End transmission.
+    PORTB |= SHIFT(SS);
 }

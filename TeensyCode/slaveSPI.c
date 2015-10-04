@@ -1,5 +1,5 @@
 /*
- * main.c
+ * slaveSPI.c
  *
  * Created: 13/09/2015.
  * Last modified: 22/09/2015.
@@ -13,55 +13,40 @@
 
 /* Function declarations */
 void Init();
+unsigned int Pull();
 
 /* Included libraries */
 #include <avr/io.h>
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "macros.h"
+#include "inc\usb_debug_only.c"
+#include "inc\print.c"
+
+#include "inc\macros.h"
 
 /* Main function */
 int main() {
-    char tempVal; // 8 bit value of the temperature.
-    char flowVal; // 8 bit value of the flow rate.
-    char tempCount = 0;
-    char flowCount = 0;
-    char i;
-    int ret;
+    CPU_PRESCALE(CPU_16MHz);
+    
+    unsigned char tempVal; // 8 bit value of the temperature.
+    unsigned char flowVal; // 8 bit value of the flow rate.
+    unsigned int data;
     
     Init();
     
     while(1) {
+        // Wait for chip select.
+        while(PINB & SHIFT(SS)) {}
         
-        for(i = 1; i >= 0; i--)
-        {
-            // Wait for transmission complete.
-            while(!(SPSR & SHIFT(SPIF))) {}
-            
-            // Save returned value.
-            ret |= (SPDR << (4 * i));
-        }
+        data = Pull();
         
-        tempVal = (char) (ret>>4);
-        flowVal = (char) ret;
-        
-        // Set LED's
-        if(tempVal == tempCount)
-        {
-            tempCount = 0;
-            PORTF ^= SHIFT(PF0);
-        } else {
-            tempCount++;
-        }
-        
-        if(flowVal == flowCount)
-        {
-            flowCount = 0;
-            PORTF ^= SHIFT(PF1);
-        } else {
-            flowCount++;
-        }
+        tempVal = (char) (data >> 8);
+        flowVal = (char) data;
+        phex(tempVal);
+        print("\t");
+        phex(flowVal);
+		print("\n");
     }
 }
 
@@ -69,13 +54,31 @@ int main() {
  */
 void Init()
 {
-    // Set outputs.
-    DDRF |= SHIFT(PF0) | SHIFT(PF1);
-    PORTF &= ~SHIFT(PF0) | ~SHIFT(PF1);
+    usb_init();
     
     // Set pins.
     DDRB |= SHIFT(MISO);
+    PORTB |= SHIFT(SS);
     
     // Set SPI modes.
     SPCR |= SHIFT(SPE);
+}
+
+unsigned int Pull()
+{
+    unsigned int ret = 0;
+    
+    // Wait for transmission complete.
+    while(!(SPSR & SHIFT(SPIF))) {}
+    
+    // Save returned value.
+    ret |= SPDR;
+    
+    // Wait for transmission complete.
+    while(!(SPSR & SHIFT(SPIF))) {}
+    
+    // Save returned value.
+    ret |= (SPDR << 8);
+    
+    return ret;
 }

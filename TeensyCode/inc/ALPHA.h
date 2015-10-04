@@ -51,19 +51,19 @@ void InitAlpha();
  * Parameters:  
  * Return:      
  */
-char ReceiveAlpha();
+unsigned char ReceiveAlpha();
 
 /* Description:  
  * Parameters:  
  * Return:      
  */
-void SendAlpha(char info);
+void SendAlpha(unsigned char info);
 
 /* Description:  
  * Parameters:  
  * Return:      
  */
-void SwtichAlpha(char dir);
+void SwtichAlpha(unsigned char dir);
 
 /* Notes on settings
 Configuration Setting Command, Default => 0x8008 -> 0b1000 0000 0000 1000

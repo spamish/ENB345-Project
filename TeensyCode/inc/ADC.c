@@ -8,13 +8,16 @@
 
 void InitADC()
 {
+    PORTF |= SHIFT(PF0) | SHIFT(PF1);
+    
+    
 	ADMUX |= SHIFT(REFS0) | SHIFT(ADLAR); //Set MUX values to 000000 or 000001.
 	ADCSRA |= SHIFT(ADEN) | SHIFT(ADPS0); //ADSC for each conversion.
 }
 
-char ReadADC(char sens)
+unsigned char ReadADC(unsigned char sens)
 {
-    char data;
+    unsigned char data;
     
     if(sens)
     {
