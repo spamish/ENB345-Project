@@ -8,8 +8,7 @@
 
 void InitADC()
 {
-    PORTF |= SHIFT(PF0) | SHIFT(PF1);
-    
+    DIDR0 |= SHIFT(PF0) | SHIFT(PF1);
     
 	ADMUX |= SHIFT(REFS0) | SHIFT(ADLAR); //Set MUX values to 000000 or 000001.
 	ADCSRA |= SHIFT(ADEN) | SHIFT(ADPS0); //ADSC for each conversion.
@@ -28,15 +27,19 @@ unsigned char ReadADC(unsigned char sens)
         ADMUX &= ~SHIFT(MUX0);
     }
     
-    // Start conversion.
+    // Start dummy conversion.
+    ADCSRA |= SHIFT(ADSC);
+    
+    // Wait for conversion to finish.
+    while(!(ADCSRA & SHIFT(ADIF))) {}
+    
+    // Start actual conversion.
     ADCSRA |= SHIFT(ADSC);
     
     // Wait for conversion to finish.
     while(!(ADCSRA & SHIFT(ADIF))) {}
     
     data = ADCH;
-    
-    ADCSRA |= SHIFT(ADIF);
     
     return data;
 }

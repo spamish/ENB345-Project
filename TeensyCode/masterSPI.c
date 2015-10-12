@@ -26,21 +26,22 @@ void Push(unsigned int data);
 
 #include "inc\macros.h"
 #include "inc\SPI.h"
+#include "inc\ADC.h"
 
 /* Main function */
 int main() {
     CPU_PRESCALE(CPU_16MHz);
     
-    unsigned char tempVal = 0x0F; // 8 bit value of the temperature.
-    unsigned char flowVal = 0xF0; // 8 bit value of the flow rate.
+    unsigned char tempVal; // 8 bit value of the temperature.
+    unsigned char flowVal; // 8 bit value of the flow rate.
     unsigned int data; // Status of device.
    
     Init();
     
     while(1) {
         // Gather sensor values.
-        tempVal++;
-        flowVal--;
+        tempVal = ReadADC(TEMP);
+        flowVal = ReadADC(FLOW);
         
         data = ((tempVal << 8) | flowVal);
         
@@ -55,6 +56,8 @@ int main() {
 void Init()
 {
     //usb_init();
+    
+    InitADC();
     
     InitSPI();
 }
