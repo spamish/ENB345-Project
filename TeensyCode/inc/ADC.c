@@ -18,13 +18,17 @@ unsigned char ReadADC(unsigned char sens)
 {
     unsigned char data;
     
-    if(sens)
+    switch(sens)
     {
-        // Select temp pin.
-        ADMUX |= SHIFT(MUX0);
-    } else {
-        // Select flow pin.
-        ADMUX &= ~SHIFT(MUX0);
+        case FLOW:
+            // Select temp pin.
+            ADMUX |= SHIFT(MUX0);
+            break;
+        
+        case TEMP:
+            // Select flow pin.
+            ADMUX &= ~SHIFT(MUX0);
+            break;
     }
     
     // Start dummy conversion.

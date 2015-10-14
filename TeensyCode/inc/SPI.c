@@ -6,16 +6,30 @@
  * Authors: Alex Fernicola, Rebecca Hopping and Samuel Janetzki.
  */
 
-void InitSPI()
+void InitSPI(char opt)
 {
-    // Set pins.
-    DDRB |= SHIFT(MOSI) | SHIFT(SCK) | SHIFT(SS);
-    PORTB |= SHIFT(SS);
-    
-    // Set SPI modes.
-    // SPCR = SPIE | SPE | DORD | MSTR | CPOL | CPHA | SPR1 | SPR0
-    SPCR |= SHIFT(SPE) | SHIFT(MSTR) | SHIFT(SPR0);
-    SPSR |= SHIFT(SPI2X);
+    switch(opt)
+    {
+        case MAST:
+            // Set pins.
+            DDRB |= SHIFT(MOSI) | SHIFT(SCK) | SHIFT(SS);
+            PORTB |= SHIFT(SS);
+            
+            // Set SPI modes.
+            // SPCR = SPIE | SPE | DORD | MSTR | CPOL | CPHA | SPR1 | SPR0
+            SPCR |= SHIFT(SPE) | SHIFT(MSTR) | SHIFT(SPR0);
+            SPSR |= SHIFT(SPI2X);
+            break;
+        
+        case SLAV:
+            // Set pins.
+            DDRB |= SHIFT(MISO);
+            PORTB |= SHIFT(SS);
+            
+            // Set SPI modes.
+            SPCR |= SHIFT(SPE);
+            break;
+    }
 }
 
 unsigned int PushSPI(unsigned int data)
@@ -45,6 +59,34 @@ unsigned int PushSPI(unsigned int data)
     
     // End transmission.
     PORTB |= SHIFT(SS);
+    
+    return ret;
+}
+
+unsigned int PullSPI(unsigned int data)
+{
+    unsigned int ret = 0;
+    
+    // Wait for chip select.
+    while(PINB & SHIFT(SS)) {}
+    
+    // Send most significant bits.
+    SPDR = (char) (data >> 8);
+    
+    // Wait for transmission complete.
+    while(!(SPSR & SHIFT(SPIF))) {}
+    
+    // Save returned value.
+    ret |= (SPDR << 8);
+    
+    // Send least significant bits.
+    SPDR = (char) data;
+    
+    // Wait for transmission complete.
+    while(!(SPSR & SHIFT(SPIF))) {}
+    
+    // Save returned value.
+    ret |= SPDR;
     
     return ret;
 }

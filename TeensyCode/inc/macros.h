@@ -21,6 +21,8 @@
 #define RX      0x52 //ASCII R
 #define READ    0xB000
 #define SEND    0xB800
+#define MAST    0
+#define SLAV    1
 
 #define CPU_PRESCALE(n) (CLKPR = 0x80, CLKPR = (n))
 #define CPU_16MHz       0x00

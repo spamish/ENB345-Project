@@ -16,10 +16,12 @@
 /* Description: Initialise the pins for use in SPI transmission, intitalise the
  *              module in master mode and set the clock rate to fck/4.
  */
-void InitSPI();
+void InitSPI(char opt);
 
 /* Description: Sends and receives data over SPI.
  * Parameters:  data - 2 bytes of data to be sent.
  * Return:      2 bytes of data received from SPI.
  */
 unsigned int PushSPI(unsigned int data);
+
+unsigned int PullSPI(unsigned int data);
