@@ -37,10 +37,8 @@ int main() {
         tempVal = ReadADC(TEMP);
         flowVal = ReadADC(FLOW);
         
-        data |= (tempVal << 8);
-        data |= flowVal;
-        
-        PushSPI(data);
+        PullSPI(tempVal);
+        PullSPI(flowVal);
     }
 }
 

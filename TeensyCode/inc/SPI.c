@@ -63,30 +63,17 @@ unsigned int PushSPI(unsigned int data)
     return ret;
 }
 
-unsigned int PullSPI(unsigned int data)
+unsigned char PullSPI(unsigned char data)
 {
-    unsigned int ret = 0;
-    
     // Wait for chip select.
     while(PINB & SHIFT(SS)) {}
     
     // Send most significant bits.
-    SPDR = (char) (data >> 8);
+    SPDR = data;
     
     // Wait for transmission complete.
     while(!(SPSR & SHIFT(SPIF))) {}
     
     // Save returned value.
-    ret |= (SPDR << 8);
-    
-    // Send least significant bits.
-    SPDR = (char) data;
-    
-    // Wait for transmission complete.
-    while(!(SPSR & SHIFT(SPIF))) {}
-    
-    // Save returned value.
-    ret |= SPDR;
-    
-    return ret;
+    return = SPDR;
 }
